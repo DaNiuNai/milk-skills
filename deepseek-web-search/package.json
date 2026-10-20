@@ -1,0 +1,13 @@
+{
+  "name": "deepseek-web-search-skill",
+  "private": true,
+  "version": "1.0.0",
+  "description": "DeepSeek Search/Fetch skill with a dependency-free Node.js CLI",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

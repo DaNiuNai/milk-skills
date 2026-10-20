@@ -1,0 +1,41 @@
+{
+  "skill_name": "deepseek-web-search",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "请使用 DeepSeek 搜索 Node.js 官方测试运行器文档，query 用 Node.js test runner site:nodejs.org，返回 3 条，带正文。将原始 JSON 和方便阅读的 Markdown 保存到输出目录，说明哪些信息来自摘要，不要再逐条抓取。",
+      "expected_output": "只进行一次 Search 逻辑调用（允许配置内的错误重试），请求 count=3、need_content=true，保留官方服务返回的 JSON，另从同一响应渲染 Markdown；若 API 错误则如实记录，不伪造结果。",
+      "files": [],
+      "assertions": [
+        "真实 Search 成功，返回 1～3 条结构完整的结果",
+        "site:nodejs.org 搜索结果均有 Node.js 官方域名来源",
+        "原始 JSON 与 Markdown 来自同一个 Search 响应，不重复请求 API",
+        "请求原样保留 query，count=3 且 need_content=true"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "抓取 https://nodejs.org/api/test.html，保存 DeepSeek 返回的 JSON，以及带来源链接的 Markdown 正文；无需先搜索，也不要调用聊天模型。",
+      "expected_output": "一次 Fetch 逻辑调用，保存 title/content 原始 JSON 及包含来源的 Markdown；确认正文非空。若目标或服务不可用则报告状态。",
+      "files": [],
+      "assertions": [
+        "真实 Fetch 成功，title/content 均为字符串且正文非空",
+        "抓取正文包含 Node.js 测试运行器相关内容而非空页面",
+        "Markdown 保留完整 content 并包含目标 URL 来源",
+        "直接调用 Fetch，仅一次 HTTP 尝试，不先 Search"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "先离线检查搜索词中的中文、emoji、精确短语和站点操作符是否会被原样发送；验证超长搜索词及带用户名密码的抓取 URL 会在联网前被拒绝，再用模拟接口检查空结果、重试边界、输出不覆盖与敏感错误脱敏。不要为这些异常情况请求真实 API。",
+      "expected_output": "dry-run 无鉴权无联网；按 Unicode 码点检查 128 字符限制；非法 URL、参数和已有输出在 API 调用前报错；本地测试通过，408/429/5xx 有限重试，其它 4xx、网络超时不自动重试，日志不含模拟密钥。",
+      "files": [],
+      "assertions": [
+        "至少 42 个离线测试全部通过，无失败、取消或跳过",
+        "dry-run 原样保留中文、emoji 和搜索操作符，不调用 API",
+        "超长 query、凭据 URL 和已有输出文件均在请求前被拒绝",
+        "本地测试覆盖重试边界、读取超时与敏感错误不回显"
+      ]
+    }
+  ]
+}

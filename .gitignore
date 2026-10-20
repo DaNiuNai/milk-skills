@@ -1,2 +1,5 @@
 # 本地生成图片、测试报告和临时验证材料
 outputs/
+
+# 网页搜索与抓取 skill 的本地评测结果（含真实网页正文）
+deepseek-web-search-workspace/

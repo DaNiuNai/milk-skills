@@ -1,5 +1,41 @@
 # skills
 
+## deepseek-web-search
+
+通过 **DeepSeek Search / Fetch API** 搜索公开网页、查找实时资料，或将单个网页抓取为 Markdown。使用 Node.js 22+ 原生 `fetch`，无需安装 npm 依赖。
+
+### 安装与配置
+
+```bash
+pnpm dlx skills add https://github.com/DaNiuNai/skills --skill deepseek-web-search
+```
+
+在本机配置 `DEEPSEEK_API_KEY` 后，完全退出并重新启动承载 Agent 的终端、编辑器或应用。仅重开会话不一定会刷新父进程继承的环境；“当前进程未获取到变量”不代表系统中没有配置。密钥仅由脚本内部用于官方接口鉴权，不加载 `.env`、不回显密钥、不支持命令行传密钥。请求固定发往 `https://api.deepseek.com`，可能按次计费。
+
+### 使用
+
+可向 Agent 提出：“使用 DeepSeek 搜索 Node.js 官方测试运行器文档，列出来源”，或从本仓库运行：
+
+```bash
+node deepseek-web-search/scripts/web.js search --query "Node.js test runner site:nodejs.org" --count 3
+```
+
+```bash
+node deepseek-web-search/scripts/web.js fetch --url "https://nodejs.org/api/test.html" --format markdown --out "./node-test.md"
+```
+
+默认输出完整 JSON；可选 Markdown 或保存为 UTF-8 文件，不覆盖现有文件。`--dry-run` 可离线预览请求，不读取密钥、不联网。支持文档中的全部 Search 参数及搜索语法；仅对 408、429、5xx 做有限退避重试，`--max-retries 0` 可禁用。
+
+完整流程、参数、来源核验与错误处理见 [deepseek-web-search/SKILL.md](deepseek-web-search/SKILL.md)。
+
+### 离线测试
+
+仅使用虚构密钥与本地模拟接口，不产生 API 费用：
+
+```bash
+node --test deepseek-web-search/tests/web.test.js
+```
+
 ## openai-image
 
 通过 **OpenAI Images API 或 OpenAI 兼容服务**生成和编辑图片，支持文生图、单张/多张参考图编辑，以及 PNG、JPEG、WebP 输出。使用原生 Node.js，无额外 npm 依赖。
