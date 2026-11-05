@@ -1,5 +1,28 @@
 # skills
 
+## ifuture-generation
+
+通过**无限画布文件生成 API** 生成图片、视频和音频，支持模型查询、参考文件直传、报价、异步任务查询与取消，以及多结果下载。使用 Node.js 24 原生能力，无 npm 依赖。
+
+```powershell
+pnpm dlx skills add https://github.com/DaNiuNai/skills --skill ifuture-generation
+```
+
+在本机配置 `IFUTURE_API_KEY` 后重启承载 Agent 的应用。接口固定为 `https://api.i-future.net`，生成会使用账号积分和存储；脚本不加载 `.env`、不回显 Key，OSS 与下载请求不附带 Key。
+
+```powershell
+node ifuture-generation/scripts/generate.mjs check-config
+node ifuture-generation/scripts/generate.mjs models --kind image --dry-run
+```
+
+先查询模型契约，再用 `prepare` 将完整请求及 UUID 保存到本地；`quote` 查询费用，`create` 仅提交已保存的请求，网络不确定时使用原请求重试。`--dry-run` 可离线预览，不读取凭据、不联网、不写文件。完整流程见 [ifuture-generation/SKILL.md](ifuture-generation/SKILL.md)。
+
+离线测试使用虚构凭据和模拟响应，不调用真实生成服务：
+
+```powershell
+node --test ifuture-generation/tests/generation.test.mjs
+```
+
 ## deepseek-web-search
 
 通过 **DeepSeek Search / Fetch API** 搜索公开网页、查找实时资料，或将单个网页抓取为 Markdown。使用 Node.js 22+ 原生 `fetch`，无需安装 npm 依赖。

@@ -1,0 +1,3 @@
+interface:
+  display_name: "无限画布文件生成"
+  short_description: "使用无限画布 API 生成图片、视频与音频，管理参考文件和异步任务"
