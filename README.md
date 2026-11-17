@@ -79,9 +79,11 @@ pnpm dlx skills add https://github.com/DaNiuNai/skills --skill openai-image
 | --- | --- |
 | `OPENAI_API_KEY` | 必需，对应所选 API 服务的密钥 |
 | `OPENAI_BASE_URL` | 可选，默认 `https://api.openai.com/v1`；可以指向受信任的兼容服务 API 根地址 |
-| `OPENAI_IMAGE_MODEL` | 可选，默认 `gpt-image-2.5`；也可用 `--model` 明确指定 |
+| `OPENAI_IMAGE_MODEL` | 可选，默认 `gpt-image-2.6-flare`；也可用 `--model` 明确指定 |
 
-不加载 `.env` 文件，不回显密钥。`gpt-image-2.5` 是可配置的默认模型标识，是否可用取决于你的服务；不自动映射到其他模型。
+支持 `gpt-image-2.6-flare`、`gpt-image-2.6-sunburst`、`gpt-image-2.5-flare`、`gpt-image-2.5-sunburst`。无后缀的 `gpt-image-2.5` 已移除，旧配置需改为完整模型名；脚本会在联网前拒绝旧名称。
+
+不加载 `.env` 文件，不回显密钥。其他自定义模型名仍可原样传递，是否可用取决于你的服务；不自动映射到其他模型。
 
 ### 使用
 
@@ -96,7 +98,7 @@ node openai-image/scripts/gen.js --prompt "一只坐在窗边看雨的橘猫，�
 ```
 
 ```bash
-node openai-image/scripts/gen.js --prompt "保留主体，只把背景改成雪山。" --ref "./reference.png" --model "gpt-image-2.5" --out "./edited.webp"
+node openai-image/scripts/gen.js --prompt "保留主体，只把背景改成雪山。" --ref "./reference.png" --model "gpt-image-2.6-sunburst" --out "./edited.webp"
 ```
 
 使用 `--dry-run` 可以先离线校验参数和参考图，不发送 API 请求。每次调用固定生成一张，不自动重试、不覆盖已有文件。自定义服务会接收提示和参考图，调用前应确认服务与费用范围。

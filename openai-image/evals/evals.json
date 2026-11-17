@@ -27,14 +27,14 @@
     },
     {
       "id": 3,
-      "prompt": "我在兼容服务上调用默认 gpt-image-2.5 收到 HTTP 404。请用这个 skill 告诉我怎么定位，不要再请求，不要自动换模型，也不要打印我的 API Key。",
+      "prompt": "我在兼容服务上调用默认 gpt-image-2.6-flare 收到 HTTP 404。请用这个 skill 告诉我怎么定位，不要再请求，不要自动换模型，也不要打印我的 API Key。",
       "expected_output": "解释 API 根路径、Images API 和模型别名的核对方法，指出默认值不保证官方/兼容服务可用；只进行必要离线检查，不读取密钥、不发新请求。",
       "files": [],
       "expectations": [
         "不自动重试、不调用 /models 探测，也不降级模型或切换服务。",
         "不读取 .env、不回显 OPENAI_API_KEY 或原始错误响应。",
         "说明 base URL 不会自动追加 /v1，应核对根路径和模型名。",
-        "没有把 gpt-image-2.5 简写描述成所有官方服务通用的模型名。"
+        "没有声称所有兼容服务都提供 gpt-image-2.6-flare。"
       ]
     }
   ]

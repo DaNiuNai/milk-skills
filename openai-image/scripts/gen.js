@@ -4,6 +4,8 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const { randomUUID } = require("node:crypto");
 const {
+  DEFAULT_MODEL,
+  KNOWN_MODELS,
   generateImage,
   ImageApiError,
   describeConfig,
@@ -19,7 +21,7 @@ function usage() {
   node scripts/gen.js --prompt-file <UTF-8文件> --out <图片.png> [选项]
 
 选项：
-  --model <名称>           覆盖 OPENAI_IMAGE_MODEL；默认 gpt-image-2.5，原样传递
+  --model <名称>           覆盖 OPENAI_IMAGE_MODEL；默认 ${DEFAULT_MODEL}，原样传递
   --base-url <API根地址>   覆盖 OPENAI_BASE_URL；默认 https://api.openai.com/v1
   --size <WIDTHxHEIGHT>    或 auto；由服务端校验模型支持的尺寸
   --quality <质量标识>     例如 low、medium、high、auto；由服务端校验
@@ -30,6 +32,8 @@ function usage() {
   --check-config          只输出 API 根地址、模型和密钥是否存在；不联网
   -h, --help              帮助
 
+内置模型：${KNOWN_MODELS.join("、")}。
+无后缀的 gpt-image-2.5 已移除；其他自定义模型名仍可原样传递。
 API Key 仅从 OPENAI_API_KEY 读取；不加载 .env，也不支持命令行密钥。
 --prompt 与 --prompt-file 二选一；--out 省略时使用当前目录的唯一 PNG 文件名。
 --ref 可重复使用，最多 16 张；不支持 mask、流式输出或批量生成。

@@ -6,7 +6,7 @@ description: >
 
 # OpenAI Image API
 
-调用用户自己的图像 API，生成或编辑一张图片并保存为本地文件。这个 skill 不复用 ChatGPT 订阅；API 服务可能按请求计费。默认模型 `gpt-image-2.5` 是可配置的服务端标识，不代表所有服务都提供该模型。
+调用用户自己的图像 API，生成或编辑一张图片并保存为本地文件。这个 skill 不复用 ChatGPT 订阅；API 服务可能按请求计费。默认模型为 `gpt-image-2.6-flare`，实际可用性取决于所选服务和账号权限。
 
 ## 工作流程
 
@@ -14,6 +14,7 @@ description: >
 
 - 区分文生图与参考图编辑；有参考图时使用编辑接口，按用户给出的顺序传入图片。
 - 原样传递用户提示。除非用户要求，不翻译、润色或增加风格；复杂、多行或含 shell 特殊字符的提示使用 UTF-8 文件。
+- 用户要求编写或优化提示词时，阅读 [提示词编写指导](references/prompting.md)，按其中的结构、构图、文字和参考图原则整理；仍以用户要求为准。
 - 明确输出路径。默认 PNG；如用户要求 JPEG/WebP，使用相应扩展名。选择未使用的文件名，不覆盖已有资产。
 - 遵守宿主环境的工具与安全要求。用户指定 API 路线时，不静默切换到 Codex、订阅登录、内置图像工具或其他服务。
 - API 环境变量存在不等于用户已授权向该地址上传。首次使用非官方服务时，告知目标地址会接收提示和参考图；没有当前任务的发送/计费授权时先确认。已确认同一服务和本次任务范围后不必重复询问。
@@ -33,7 +34,18 @@ node "<skill目录>/scripts/gen.js" --check-config
 | ---------- | -------------------------------------------------------------- |
 | API Key    | `OPENAI_API_KEY`；不支持命令行传密钥                           |
 | API 根地址 | `--base-url` → `OPENAI_BASE_URL` → `https://api.openai.com/v1` |
-| 模型       | `--model` → `OPENAI_IMAGE_MODEL` → `gpt-image-2.5`             |
+| 模型       | `--model` → `OPENAI_IMAGE_MODEL` → `gpt-image-2.6-flare`       |
+
+支持以下四个完整模型名，均可用于文生图和参考图编辑：
+
+| 模型 | 版本与变体 |
+| --- | --- |
+| `gpt-image-2.6-flare` | 2.6 Flare，默认模型 |
+| `gpt-image-2.6-sunburst` | 2.6 Sunburst |
+| `gpt-image-2.5-flare` | 2.5 Flare |
+| `gpt-image-2.5-sunburst` | 2.5 Sunburst |
+
+无后缀的 `gpt-image-2.5` 已移除，传入时会在联网前报错；旧配置需改为上述完整名称之一。其他自定义模型名仍可原样传递，不自动映射。
 
 用户在本机自行配置凭据，不要让用户把 Key 粘贴到聊天、提示文件或命令行中。新设系统环境变量后，可能需要重新启动宿主应用才对脚本生效。缺少 Key 时停止并说明缺少哪个变量；不要寻找其他配置文件或凭据。
 
@@ -62,7 +74,7 @@ node "<skill目录>/scripts/gen.js" --prompt "使用第一张图的主体与第�
 **明确指定模型及输出参数：**
 
 ```bash
-node "<skill目录>/scripts/gen.js" --prompt-file "./prompt.txt" --model "gpt-image-2.5" --size "1536x1024" --quality "high" --out "./landscape.webp"
+node "<skill目录>/scripts/gen.js" --prompt-file "./prompt.txt" --model "gpt-image-2.6-sunburst" --size "1536x1024" --quality "high" --out "./landscape.webp"
 ```
 
 模型名原样发送；服务不支持时报告错误，不静默更换模型、服务或认证方式。仅当用户明确指定时传入 size、quality 和 background；不同模型和兼容服务的支持范围可能不同。
@@ -92,7 +104,7 @@ node "<skill目录>/scripts/gen.js" --prompt-file "./prompt.txt" --out "./result
 | `--prompt` / `--prompt-file` | 二选一；文件使用 UTF-8，去掉开头 BOM，其他内容原样发送                      |
 | `--out`                      | `.png` / `.jpg` / `.jpeg` / `.webp`；省略时在当前目录生成唯一 PNG 文件名    |
 | `--ref`                      | 可重复，最多 16 张；支持实际内容为 PNG/JPEG/WebP 的本地文件，每张小于 50 MB |
-| `--model`                    | 覆盖模型环境变量与默认值；不探测或映射模型                                  |
+| `--model`                    | 覆盖模型环境变量与默认值；不探测或映射模型，拒绝已移除的无后缀 2.5          |
 | `--base-url`                 | 覆盖 API 根地址；不允许 URL 内嵌用户名、密码、查询参数或片段                |
 | `--size`                     | `auto` 或 `WIDTHxHEIGHT`；具体范围由服务端校验                              |
 | `--quality`                  | 例如 `auto` / `low` / `medium` / `high`；原样发送服务端质量标识             |
@@ -135,7 +147,7 @@ async function main() {
     prompt: "保留角色外观，只把背景改为海边。",
     refs: ["./character.png"],
     out: "./seaside.png",
-    model: "gpt-image-2.5",
+    model: "gpt-image-2.5-sunburst",
     timeoutSec: 300,
   });
   console.log(outputPath);

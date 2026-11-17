@@ -6,7 +6,7 @@
 - 编辑：`POST <base>/images/edits`，`multipart/form-data`，每张参考图使用重复的 `image[]` 字段。由原生 FormData 设置 boundary。
 - 认证仅向上述 API 地址发送 `Authorization: Bearer <key>`。
 - 共同字段为 `model`、原始 `prompt`、固定 `n: 1` 和 `output_format`；用户指定时增加 `size`、`quality`、`background`。
-- 默认模型是用户约定的 `gpt-image-2.5`。兼容服务可能使用自定义别名；不能由客户端推断该别名对应哪个官方模型/快照。
+- 默认模型为 `gpt-image-2.6-flare`；支持 `gpt-image-2.6-flare`、`gpt-image-2.6-sunburst`、`gpt-image-2.5-flare`、`gpt-image-2.5-sunburst` 的生成和编辑请求。无后缀的 `gpt-image-2.5` 已移除，脚本在联网前拒绝该名称，不自动替换。兼容服务的其他自定义模型名仍原样发送；不能由客户端推断其对应哪个官方模型/快照。
 - 不发送 `response_format`、`input_fidelity`、`stream` 或 `partial_images`。GPT Image 的编码输出通常在 `b64_json`；`output_format` 表示图片编码格式，而不是响应使用 URL 还是 base64。
 - 不对任意模型硬编码官方某个旧版本的尺寸与质量上限。参数语法通过不代表服务端支持；遇到不兼容需依据该服务文档，在用户同意后调整。
 
@@ -54,5 +54,6 @@ HTML、SSE、`partial_image_b64`、空 data、多图结果或没有最终载荷�
 - [OpenAI 图像生成指南](https://developers.openai.com/api/docs/guides/image-generation?generate-images-api=responses)
 - [Images API：生成](https://developers.openai.com/api/reference/resources/images/methods/generate)
 - [Images API：编辑](https://developers.openai.com/api/reference/resources/images/methods/edit)
+- [OpenAI 模型目录](https://developers.openai.com/api/docs/models/all)
 
-接口支持随模型和服务变化，以目标服务最新文档为准。这些链接不构成对 `gpt-image-2.5` 简写在官方服务可用性的保证。
+模型名已于 2026-11-17 对照官方目录核对。接口支持随模型和服务变化，以目标服务最新文档为准；官方文档不保证兼容服务提供相同模型或能力。

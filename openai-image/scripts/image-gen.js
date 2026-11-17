@@ -2,7 +2,13 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 
 const DEFAULT_BASE_URL = "https://api.openai.com/v1";
-const DEFAULT_MODEL = "gpt-image-2.5";
+const DEFAULT_MODEL = "gpt-image-2.6-flare";
+const KNOWN_MODELS = Object.freeze([
+  DEFAULT_MODEL,
+  "gpt-image-2.6-sunburst",
+  "gpt-image-2.5-flare",
+  "gpt-image-2.5-sunburst",
+]);
 const MAX_IMAGE_BYTES = 50_000_000;
 const EXTENSIONS = {
   ".png": "png",
@@ -56,6 +62,12 @@ function resolveConfig(options = {}, environment = process.env) {
     options.model ?? (environment.OPENAI_IMAGE_MODEL || DEFAULT_MODEL);
   if (typeof model !== "string" || !model.trim()) {
     throw new ImageApiError("模型名称不能为空。", 2);
+  }
+  if (model.trim() === "gpt-image-2.5") {
+    throw new ImageApiError(
+      `已移除无后缀模型 gpt-image-2.5；请通过 --model 或 OPENAI_IMAGE_MODEL 指定完整模型名：${KNOWN_MODELS.join("、")}。`,
+      2,
+    );
   }
   const apiKey = environment.OPENAI_API_KEY;
   if (
@@ -461,6 +473,8 @@ async function generateImage(options = {}) {
 }
 
 module.exports = {
+  DEFAULT_MODEL,
+  KNOWN_MODELS,
   generateImage,
   ImageApiError,
   resolveConfig,

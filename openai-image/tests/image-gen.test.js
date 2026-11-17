@@ -104,7 +104,7 @@ after(async () => {
 test("配置采用 CLI/库参数 > OPENAI_* > 默认值，默认模型不被映射", () => {
   assert.deepEqual(resolveConfig({}, {}), {
     baseUrl: "https://api.openai.com/v1",
-    model: "gpt-image-2.5",
+    model: "gpt-image-2.6-flare",
     apiKey: "",
   });
   const env = {
@@ -150,7 +150,7 @@ test("文生图发送正确 JSON 和认证，默认一张 PNG 且不混入不兼
   assert.equal(request.method, "POST");
   assert.equal(request.headers.authorization, `Bearer ${FAKE_KEY}`);
   assert.deepEqual(JSON.parse(request.body), {
-    model: "gpt-image-2.5",
+    model: "gpt-image-2.6-flare",
     prompt,
     n: 1,
     output_format: "png",
@@ -167,6 +167,74 @@ test("显式覆盖模型和 API 根路径，不重复追加 /v1", async () => {
   });
   assert.equal(requests[0].url, "/custom/api/images/generations");
   assert.equal(JSON.parse(requests[0].body).model, "custom-image-2026");
+});
+
+for (const model of [
+  "gpt-image-2.6-flare",
+  "gpt-image-2.6-sunburst",
+  "gpt-image-2.5-flare",
+  "gpt-image-2.5-sunburst",
+]) {
+  test(`${model} 支持 CLI 生成和库参考图编辑，模型名原样发送`, async () => {
+    const generated = out();
+    const result = await runCli([
+      "--prompt",
+      "test",
+      "--model",
+      model,
+      "--out",
+      generated,
+    ]);
+    assert.equal(result.code, 0, result.stderr);
+    assert.equal(requests[0].url, "/v1/images/generations");
+    assert.equal(JSON.parse(requests[0].body).model, model);
+    assert.deepEqual(await fs.readFile(generated), PNG);
+
+    const edited = out();
+    assert.equal(
+      await generateImage({
+        prompt: "edit",
+        model,
+        refs: [generated],
+        out: edited,
+      }),
+      edited,
+    );
+    assert.equal(requests.length, 2);
+    assert.equal(requests[1].url, "/v1/images/edits");
+    const form = await new Response(requests[1].body, {
+      headers: { "Content-Type": requests[1].headers["content-type"] },
+    }).formData();
+    assert.equal(form.get("model"), model);
+    assert.equal(form.getAll("image[]").length, 1);
+    assert.deepEqual(await fs.readFile(edited), PNG);
+    assert.equal(resolveConfig({}, { OPENAI_IMAGE_MODEL: model }).model, model);
+  });
+}
+
+test("无后缀 2.5 在联网前被拒绝，显式完整模型名可覆盖旧环境配置", async () => {
+  for (const model of ["gpt-image-2.5", " gpt-image-2.5 "]) {
+    await assert.rejects(
+      generateImage({ prompt: "test", out: out(), model }),
+      (error) => error.exitCode === 2 && /完整模型名/.test(error.message),
+    );
+  }
+  for (const args of [
+    ["--check-config"],
+    ["--prompt", "test", "--out", out(), "--dry-run"],
+    ["--prompt", "test", "--out", out()],
+  ]) {
+    const result = await runCli(args, { OPENAI_IMAGE_MODEL: "gpt-image-2.5" });
+    assert.equal(result.code, 2);
+    assert.match(result.stderr, /完整模型名/);
+  }
+  const result = await runCli(
+    ["--check-config", "--model", "gpt-image-2.5-sunburst"],
+    { OPENAI_IMAGE_MODEL: "gpt-image-2.5" },
+  );
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).model, "gpt-image-2.5-sunburst");
+  assert.equal(requests.length, 0);
 });
 
 test("仅传递用户指定的可选参数，不限制未知模型的合法尺寸与质量名称", async () => {
@@ -208,7 +276,7 @@ test("多参考图采用 multipart image[]，保留顺序和原始提示", async
   const form = await new Response(request.body, {
     headers: { "Content-Type": request.headers["content-type"] },
   }).formData();
-  assert.equal(form.get("model"), "gpt-image-2.5");
+  assert.equal(form.get("model"), "gpt-image-2.6-flare");
   assert.equal(form.get("prompt"), "只替换背景，不要修改主体。");
   assert.equal(form.get("n"), "1");
   assert.equal(form.get("quality"), "high");
@@ -285,7 +353,7 @@ test("CLI 检查配置不联网，密钥只显示布尔值", async () => {
   assert.equal(result.code, 0, result.stderr);
   assert.deepEqual(JSON.parse(result.stdout), {
     baseUrl,
-    model: "gpt-image-2.5",
+    model: "gpt-image-2.6-flare",
     apiKeyConfigured: true,
   });
   assert.ok(!`${result.stdout}${result.stderr}`.includes(FAKE_KEY));
@@ -391,7 +459,7 @@ test("HTTP 错误分层、不回显远端的密钥、不自动重试或换模型
     assert.equal(requests.length, count + 1);
     assert.equal(
       JSON.parse(requests[requests.length - 1].body).model,
-      "gpt-image-2.5",
+      "gpt-image-2.6-flare",
     );
   }
 });
