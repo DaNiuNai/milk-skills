@@ -6,7 +6,6 @@
 
 | Skill | 说明 |
 | --- | --- |
-| [deepseek-web-search](deepseek-web-search/SKILL.md) | 通过 DeepSeek Search / Fetch API 搜索网页、抓取网页正文 |
 | [openai-image](openai-image/SKILL.md) | 通过 OpenAI Images API 或兼容服务生成、编辑图片 |
 | [gpt-image-fragmentation-guard](gpt-image-fragmentation-guard/SKILL.md) | 预防、诊断和修复 GPT Image 生成中的碎图问题 |
 | [sdxl-lora-tag-edit](sdxl-lora-tag-edit/SKILL.md) | 为 SDXL LoRA 训练数据集编辑标签 |
