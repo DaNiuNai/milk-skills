@@ -6,6 +6,7 @@
 
 | Skill | 说明 |
 | --- | --- |
+| [gpt-image](gpt-image/SKILL.md) | 使用 OpenAI GPT Image 模型生成和编辑图片（零依赖 Node.js 工具，需 Node ≥ 24.5） |
 | [gpt-image-fragmentation-guard](gpt-image-fragmentation-guard/SKILL.md) | 预防、诊断和修复 GPT Image 生成中的碎图问题 |
 | [sdxl-lora-tag-edit](sdxl-lora-tag-edit/SKILL.md) | 为 SDXL LoRA 训练数据集编辑标签 |
 
