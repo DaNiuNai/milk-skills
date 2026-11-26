@@ -1,0 +1,13 @@
+{
+  "defaultModel": "gpt-image-2.6-flare",
+  "responsesMainModel": "gpt-5.5",
+  "responsesToolModel": "gpt-image-2.6-flare",
+  "svgModel": "gpt-5.5",
+  "outDir": "output",
+  "proxy": "",
+  "baseUrl": "",
+  "apiKeyEnv": "",
+  "timeoutMs": 600000,
+  "maxRetries": 2,
+  "models": {}
+}
